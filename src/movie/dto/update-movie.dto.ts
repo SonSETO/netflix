@@ -29,11 +29,46 @@ import {
   MinLength,
   NotContains,
   NotEquals,
+  registerDecorator,
+  Validate,
+  ValidationArguments,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 
 enum MovieGenre {
   Fantasy = 'fantasy',
   Action = 'action',
+}
+
+// 커스텀 벨리데이터 해보기
+@ValidatorConstraint({
+  async: true,
+})
+class PassWordValidator implements ValidatorConstraintInterface {
+  validate(
+    value: any,
+    validationArguments?: ValidationArguments,
+  ): Promise<boolean> | boolean {
+    // 비밀번호 길이는 4-8
+    return value.length > 4 && value.length < 8;
+  }
+  defaultMessage(validationArguments?: ValidationArguments): string {
+    return '비밀번호의 길이는 4-8자여야 합니다. 현재 입력된 비밀번호: ($value)';
+  }
+}
+
+function IsPasswordValid(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      // 타켓,프로퍼티네임,옵션은 디폴트로 들어감
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: PassWordValidator,
+    });
+  };
 }
 
 export class updateMovieDto {
@@ -136,5 +171,10 @@ export class updateMovieDto {
   //   @IsLatLong()
   //   위도 경도
 
+  //   @Validate(PassWordValidator, {
+  //     message: '다른 에러 메시지',
+  //   })
+
+  @IsPasswordValid()
   test: string;
 }
