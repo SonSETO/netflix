@@ -169,10 +169,21 @@ enum MovieGenre {
 
 export class updateMovieDto {
   @IsNotEmpty()
+  @IsString()
   @IsOptional()
   title?: string;
 
   @IsNotEmpty()
   @IsOptional()
+  @IsString()
   genre?: string;
+
+  @IsNotEmpty()
+  @IsOptional()
+  detail?: string;
+
+  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  directorId?: number;
 }

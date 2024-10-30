@@ -1,14 +1,22 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 import {
-  ChildEntity,
   Column,
-  CreateDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
-  TableInheritance,
-  UpdateDateColumn,
-  VersionColumn,
 } from 'typeorm';
+import { BaseTable } from '../../common/entity/base-table.entity';
+import { MovieDetail } from './movie-detail.entity';
+import { Director } from 'src/director/entity/director.entity';
+import { Genre } from 'src/genre/entity/genre.entity';
+
+// ManyToOne Director -> 감독은 여러개의 영화를 만들 수 있음
+// OneToOne MovieDetail -> 영화는 하나의 상세 내용을 갖을 수 있음
+// ManyToMany Genre -> 영화는 여러개의 장르를 갖을 수 있고 장르는 여러개의 영화에 속할 수 있음
 
 // @Exclude()
 // 보안에 민감할 때 노출시키지 않을 수 있다
@@ -22,32 +30,39 @@ import {
 // 전부 대문자로 바꾸겠다
 
 // 이렇게 공통인 애들은 common으로 빼서 다 상속해주면 편함
-export class BaseEntity {
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @VersionColumn()
-  version: number;
-}
 
 //실제로는 이렇게 안할거지만 싱글테이블로 실습해보기 위해  movie / series -> Content
 // runtime(영화 상영시간) / seriesCount(몇개 부작인지)
 
 @Entity()
-export class Movie extends BaseEntity {
+export class Movie extends BaseTable {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   title: string;
 
-  @Column()
-  genre: string;
+  @ManyToMany(() => Genre, (genre) => genre.movies)
+  @JoinTable()
+  genres: Genre[];
+
+  @OneToOne(() => MovieDetail, (MovieDetail) => MovieDetail.id, {
+    cascade: true,
+    nullable: false,
+  })
+  @JoinColumn()
+  detail: MovieDetail;
+
+  @ManyToOne(() => Director, (director) => director.id, {
+    cascade: true,
+    nullable: false,
+  })
+  director: Director;
 
   // @Column(() => BaseEntity)
   // base: BaseEntity;
   // 이거 안이쁨 객체로 들어가고 base가 생김
 }
+//
