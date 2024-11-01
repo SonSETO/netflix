@@ -37,11 +37,8 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-
-enum MovieGenre {
-  Fantasy = 'fantasy',
-  Action = 'action',
-}
+import { createMovieDto } from './create-movie.dto';
+import { PartialType } from '@nestjs/mapped-types';
 
 // 커스텀 벨리데이터 해보기
 // @ValidatorConstraint({
@@ -168,29 +165,26 @@ enum MovieGenre {
 //     message: '다른 에러 메시지',
 //   })
 
-export class updateMovieDto {
-  @IsNotEmpty()
-  @IsString()
-  @IsOptional()
-  title?: string;
-
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsNumber(
-    {},
-    {
-      each: true,
-    },
-  )
-  @IsOptional()
-  genreIds?: number[];
-
-  @IsNotEmpty()
-  @IsOptional()
-  detail?: string;
-
-  @IsNotEmpty()
-  @IsOptional()
-  @IsNumber()
-  directorId?: number;
-}
+export class updateMovieDto extends PartialType(createMovieDto) {}
+// @IsNotEmpty()
+// @IsString()
+// @IsOptional()
+// title?: string;
+// @IsArray()
+// @ArrayNotEmpty()
+// @IsNumber(
+//   {},
+//   {
+//     each: true,
+//   },
+// )
+// @IsOptional()
+// genreIds?: number[];
+// @IsNotEmpty()
+// @IsString()
+// @IsOptional()
+// detail?: string;
+// @IsNotEmpty()
+// @IsOptional()
+// @IsNumber()
+// directorId?: number;
