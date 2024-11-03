@@ -1,5 +1,15 @@
-import { Controller, Headers, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './strategy/local.strategy';
+import { JwtAuthGuard } from './strategy/jwt.strategy';
 
 @Controller('auth')
 export class AuthController {
@@ -11,8 +21,59 @@ export class AuthController {
     return this.authService.register(token);
   }
 
+  // authorization: Basic $token
   @Post('login')
   loginUser(@Headers('authorization') token: string) {
     return this.authService.login(token);
   }
+
+  @Post('token/access')
+  async rotateAccessToken(@Headers('authorization') token: string) {
+    const payload = await this.authService.parseBearerToken(token, true);
+
+    return {
+      accessToken: await this.authService.issueToken(payload, false),
+    };
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login/passport')
+  async loginUserPassport(@Request() req) {
+    return {
+      refreshToken: await this.authService.issueToken(req.user, true),
+      accessToken: await this.authService.issueToken(req.user, false),
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('private')
+  async private(@Request() req) {
+    return req.user;
+  }
 }
+
+/*
+귀찮게 basic토큰 없이 일반적으로 할 때
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('register')
+  registerUser(@Body('email') email: string, @Body('password') password: string) {
+    return this.authService.register(email, password);
+  }
+
+  @Post('login')
+  loginUser(@Body('email') email: string, @Body('password') password: string) {
+    return this.authService.login(email, password);
+  }
+
+  @Post('refresh-token')
+  async refreshAccessToken(@Headers('authorization') refreshToken: string) {
+    const token = refreshToken.replace('Bearer ', '');
+    return {
+      accessToken: await this.authService.refreshAccessToken(token),
+    };
+  }
+}
+ */
