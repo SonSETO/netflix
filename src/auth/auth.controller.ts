@@ -28,22 +28,23 @@ export class AuthController {
   }
 
   @Post('token/access')
-  async rotateAccessToken(@Headers('authorization') token: string) {
-    const payload = await this.authService.parseBearerToken(token, true);
-
+  async rotateAccessToken(@Request() req) {
     return {
-      accessToken: await this.authService.issueToken(payload, false),
+      accessToken: await this.authService.issueToken(
+        { id: req.user.sub, role: req.user.role },
+        false,
+      ),
     };
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login/passport')
-  async loginUserPassport(@Request() req) {
-    return {
-      refreshToken: await this.authService.issueToken(req.user, true),
-      accessToken: await this.authService.issueToken(req.user, false),
-    };
-  }
+  // @UseGuards(LocalAuthGuard)
+  // @Post('login/passport')
+  // async loginUserPassport(@Request() req) {
+  //   return {
+  //     refreshToken: await this.authService.issueToken(req.user, true),
+  //     accessToken: await this.authService.issueToken(req.user, false),
+  //   };
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Get('private')

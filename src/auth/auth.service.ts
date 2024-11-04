@@ -71,9 +71,12 @@ export class AuthService {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>(
-          envVariableKeys.refreshTokenSecret,
+          isRefreshToken
+            ? envVariableKeys.refreshTokenSecret
+            : envVariableKeys.accessTokenSecret,
         ),
       });
+
       if (isRefreshToken) {
         if (payload.type !== 'refresh') {
           throw new BadRequestException('Refresh 토큰을 입력해주세요!');
