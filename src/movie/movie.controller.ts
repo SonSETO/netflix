@@ -23,6 +23,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entity/user.entity';
+import { GetMoviesDto } from './dto/get-movies.dto';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,10 +32,10 @@ export class MovieController {
 
   @Get()
   @Public()
-  getMovies(@Query('title', MovieTitleValidationPipe) title?: string) {
+  getMovies(@Query() dto: GetMoviesDto) {
     // title 쿼리 타입이 string 타입인지?
 
-    return this.movieService.findAll(title);
+    return this.movieService.findAll(dto);
   }
 
   @Get(':id')

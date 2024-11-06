@@ -7,6 +7,7 @@ import { RBAC } from '../decorator/rbac.decorator';
 @Injectable()
 export class RBACGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
+
   canActivate(context: ExecutionContext): boolean {
     const role = this.reflector.get<Role>(RBAC, context.getHandler());
 
