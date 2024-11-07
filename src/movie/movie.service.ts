@@ -26,7 +26,8 @@ export class MovieService {
   ) {}
 
   async findAll(dto: GetMoviesDto) {
-    const { title, take, page } = dto;
+    const { title } = dto;
+    // const { title, take, page } = dto; // page-Pagination
     // Query Builder 사용
     const qb = await this.movieRepository
       .createQueryBuilder('movie')
@@ -37,12 +38,22 @@ export class MovieService {
       qb.where('movie.title LIKE :title', { title: `%${title}%` });
     }
 
-    // commonServer와 모듈 받아서 주입
-    if (take && page) {
-      this.commonService.applyPagePaginationParamsToQb(qb, dto);
-    }
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
-    return await qb.getManyAndCount();
+    // commonServer와 모듈 받아서 주입
+    // page기반 pagination
+    // if (take && page) {
+    // this.commonService.applyPagePaginationParamsToQb(qb, dto);
+    // }
+
+    const [data, count] = await qb.getManyAndCount();
+
+    return {
+      data,
+      nextCursor,
+      count,
+    };
 
     // Repository 사용
     // if (!title) {
