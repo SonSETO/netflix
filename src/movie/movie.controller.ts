@@ -24,6 +24,8 @@ import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entity/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+// import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,6 +34,7 @@ export class MovieController {
 
   @Get()
   @Public()
+  // @UseInterceptors(CacheInterceptor)
   getMovies(@Query() dto: GetMoviesDto) {
     // title 쿼리 타입이 string 타입인지?
 
@@ -49,8 +52,9 @@ export class MovieController {
 
   @Post()
   @RBAC(Role.admin)
-  postMovie(@Body() body: createMovieDto) {
-    return this.movieService.create(body);
+  @UseInterceptors(TransactionInterceptor)
+  postMovie(@Body() body: createMovieDto, @Request() req) {
+    return this.movieService.create(body, req.queryRunner);
   }
 
   @Patch(':id')
