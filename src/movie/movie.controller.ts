@@ -14,6 +14,7 @@ import {
   BadRequestException,
   Request,
   UseGuards,
+  UploadedFile,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
@@ -25,6 +26,7 @@ import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entity/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 @Controller('movie')
@@ -53,7 +55,13 @@ export class MovieController {
   @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  postMovie(@Body() body: createMovieDto, @Request() req) {
+  @UseInterceptors(FileInterceptor('movie'))
+  postMovie(
+    @Body() body: createMovieDto,
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(file);
     return this.movieService.create(body, req.queryRunner);
   }
 
