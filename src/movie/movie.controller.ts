@@ -15,6 +15,7 @@ import {
   Request,
   UseGuards,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
@@ -26,7 +27,12 @@ import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entity/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { MovieFilePipe } from './pipe/movie-file.pipe';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 @Controller('movie')
@@ -52,16 +58,79 @@ export class MovieController {
     return this.movieService.findOne(id);
   }
 
+  // @Post()
+  // @RBAC(Role.admin)
+  // @UseInterceptors(TransactionInterceptor)
+  // // @UseInterceptors(FilesInterceptor('movies'))
+  // @UseInterceptors(
+  //   FileFieldsInterceptor(
+  //     [
+  //       {
+  //         name: 'movie',
+  //         maxCount: 1,
+  //       },
+  //       {
+  //         name: 'poster',
+  //         maxCount: 2,
+  //       },
+  //     ],
+  //     {
+  //       limits: {
+  //         fileSize: 20000000,
+  //       },
+  //       fileFilter(req, file, callback) {
+  //         console.log(file);
+  //         if (file.mimetype !== 'video/mp4') {
+  //           return callback(
+  //             new BadRequestException('MP4 타입만 업로드 가능합니다!'),
+  //             false,
+  //           );
+  //         }
+  //         return callback(null, true);
+  //       },
+  //     },
+  //   ),
+  // )
   @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  @UseInterceptors(FileInterceptor('movie'))
+  // @UseInterceptors(FilesInterceptor('movies'))
+  @UseInterceptors(
+    FileInterceptor('movie', {
+      limits: {
+        fileSize: 20000000,
+      },
+      fileFilter(req, file, callback) {
+        console.log(file);
+        if (file.mimetype !== 'video/mp4') {
+          return callback(
+            new BadRequestException('MP4 타입만 업로드 가능합니다!'),
+            false,
+          );
+        }
+        return callback(null, true);
+      },
+    }),
+  )
   postMovie(
     @Body() body: createMovieDto,
     @Request() req,
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFiles() files: Express.Multer.File[],
+    // @UploadedFiles(
+    @UploadedFile(
+      new MovieFilePipe({
+        maxSize: 20,
+        mimetype: 'video/mp4',
+      }),
+    )
+    movie: Express.Multer.File,
+    // files: {
+    //   movie?: Express.Multer.File[];
+    //   poster?: Express.Multer.File[];
+    // },
   ) {
-    console.log(file);
+    console.log('--------------');
+    console.log(movie);
     return this.movieService.create(body, req.queryRunner);
   }
 
