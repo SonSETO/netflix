@@ -33,7 +33,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { MovieFilePipe } from './pipe/movie-file.pipe';
-import { userId } from 'src/user/decorator/user-id.decorator';
+import { UserId } from 'src/user/decorator/user-id.decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
@@ -132,7 +132,7 @@ export class MovieController {
     @Body() body: createMovieDto,
     // @Request() req,
     @QueryRunner() queryRunner: QR,
-    @userId() userId: number,
+    @UserId() userId: number,
   ) {
     return this.movieService.create(body, userId, queryRunner);
   }
@@ -151,4 +151,31 @@ export class MovieController {
   deleteMovie(@Param('id', ParseIntPipe) id: number) {
     return this.movieService.remove(id);
   }
+
+  @Post(':id/like')
+  createMovieLike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {}
+
+  @Post(':id/dislike')
+  createMovieDislike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {}
 }
+
+/*
+
+  [Like] [Dislike]
+  아무것도 누리지 않은 상태=> Like & Dislike 모두 버튼 꺼져있음
+
+  Like버튼 누르면 -> Like버튼 불 켜짐
+  Like버튼 다시 누르면 -> Like버튼 불 꺼짐
+
+  DisLike버튼 누르면 -> DisLike버튼 불 켜짐
+  DisLike버튼 다시 누르면 -> DisLike버튼 불 꺼짐
+
+  Like버튼 누르면 -> Like버튼 불 켜짐
+  Dislike 버튼 누르면 -> Like버튼 불 꺼지고 Dislike 버튼 불 켜짐
+*/
