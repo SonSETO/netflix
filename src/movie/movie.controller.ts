@@ -33,6 +33,9 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { MovieFilePipe } from './pipe/movie-file.pipe';
+import { userId } from 'src/user/decorator/user-id.decorator';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
+import { QueryRunner as QR } from 'typeorm';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 @Controller('movie')
@@ -91,47 +94,47 @@ export class MovieController {
   //     },
   //   ),
   // )
+
+  // @UseInterceptors(FilesInterceptor('movies'))
+  // @UseInterceptors(
+  //   FileInterceptor('movie', {
+  //     limits: {
+  //       fileSize: 20000000,
+  //     },
+  //     fileFilter(req, file, callback) {
+  //       console.log(file);
+  //       if (file.mimetype !== 'video/mp4') {
+  //         return callback(
+  //           new BadRequestException('MP4 타입만 업로드 가능합니다!'),
+  //           false,
+  //         );
+  //       }
+  //       return callback(null, true);
+  //     },
+  //   }),
+  // )
+  //@UploadedFile() movie: Express.Multer.File,
+  // @UploadedFiles() files: Express.Multer.File[],
+  // @UploadedFiles(
+  // new MovieFilePipe({
+  //   maxSize: 20,
+  //   mimetype: 'video/mp4',
+  // }),
+  // files: {
+  //   movie?: Express.Multer.File[];
+  //   poster?: Express.Multer.File[];
+  // },
+
   @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  // @UseInterceptors(FilesInterceptor('movies'))
-  @UseInterceptors(
-    FileInterceptor('movie', {
-      limits: {
-        fileSize: 20000000,
-      },
-      fileFilter(req, file, callback) {
-        console.log(file);
-        if (file.mimetype !== 'video/mp4') {
-          return callback(
-            new BadRequestException('MP4 타입만 업로드 가능합니다!'),
-            false,
-          );
-        }
-        return callback(null, true);
-      },
-    }),
-  )
   postMovie(
     @Body() body: createMovieDto,
-    @Request() req,
-    // @UploadedFiles() files: Express.Multer.File[],
-    // @UploadedFiles(
-    @UploadedFile(
-      new MovieFilePipe({
-        maxSize: 20,
-        mimetype: 'video/mp4',
-      }),
-    )
-    movie: Express.Multer.File,
-    // files: {
-    //   movie?: Express.Multer.File[];
-    //   poster?: Express.Multer.File[];
-    // },
+    // @Request() req,
+    @QueryRunner() queryRunner: QR,
+    @userId() userId: number,
   ) {
-    console.log('--------------');
-    console.log(movie);
-    return this.movieService.create(body, req.queryRunner);
+    return this.movieService.create(body, userId, queryRunner);
   }
 
   @Patch(':id')
