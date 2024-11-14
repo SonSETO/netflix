@@ -14,18 +14,23 @@ export class MovieUserLike {
     name: 'movieId',
     type: 'int8',
   })
-  @ManyToOne(() => Movie, (movie) => movie.likedUsers)
+  @ManyToOne(() => Movie, (movie) => movie.likedUsers, {
+    onDelete: 'CASCADE',
+  })
   movie: Movie;
 
   @PrimaryColumn({
     name: 'userId',
     type: 'int8',
   })
-  @ManyToOne(() => User, (user) => user.likedMovies)
+  @ManyToOne(() => User, (user) => user.likedMovies, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @Column()
   isLike: boolean;
+  // 애가 트루면 좋아요 상태
 }
 /*
     중간테이블 만들고 M:N일 때 이런식으로도 가능

@@ -46,10 +46,10 @@ export class MovieController {
   @Get()
   @Public()
   // @UseInterceptors(CacheInterceptor)
-  getMovies(@Query() dto: GetMoviesDto) {
+  getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     // title 쿼리 타입이 string 타입인지?
 
-    return this.movieService.findAll(dto);
+    return this.movieService.findAll(dto, userId);
   }
 
   @Get(':id')
@@ -156,13 +156,17 @@ export class MovieController {
   createMovieLike(
     @Param('id', ParseIntPipe) movieId: number,
     @UserId() userId: number,
-  ) {}
+  ) {
+    return this.movieService.toggleMovieLike(movieId, userId, true);
+  }
 
   @Post(':id/dislike')
   createMovieDislike(
     @Param('id', ParseIntPipe) movieId: number,
     @UserId() userId: number,
-  ) {}
+  ) {
+    return this.movieService.toggleMovieLike(movieId, userId, false);
+  }
 }
 
 /*
