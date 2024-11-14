@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -20,6 +21,7 @@ import { rename } from 'fs/promises';
 import { User } from 'src/user/entity/user.entity';
 import { preconnect } from 'next/dist/server/app-render/entry-base';
 import { MovieUserLike } from './entity/movie-user-like.entity';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class MovieService {
@@ -38,6 +40,8 @@ export class MovieService {
     private readonly movieUserLikeRepository: Repository<MovieUserLike>,
     private readonly dataSource: DataSource,
     private readonly commonService: CommonService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async getLikedMovies(movieIds: number[], userId: number) {
@@ -48,6 +52,28 @@ export class MovieService {
       .where('movie.id IN(:...movieIds)', { movieIds })
       .andWhere('user.id = :userId', { userId })
       .getMany();
+  }
+
+  async findRecent() {
+    const cacheData = await this.cacheManager.get('MOVIE_RECENT');
+
+    if (cacheData) {
+      console.log('캐쉬가쟈옴');
+      return cacheData;
+    }
+
+    const data = await this.movieRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 10,
+    });
+
+    // set에서 맨마지막은 TTL 저장시간을 뜻함
+    // 모듈단에서 정의를 해도 서비스단에서 정의를 하면 오버라이딩해서 서비스단에서 정의한 값이 적용됨
+    await this.cacheManager.set('MOVIE_RECENT', data);
+
+    return data;
   }
 
   async findAll(dto: GetMoviesDto, userId?: number) {
