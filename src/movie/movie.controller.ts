@@ -36,6 +36,12 @@ import { MovieFilePipe } from './pipe/movie-file.pipe';
 import { UserId } from 'src/user/decorator/user-id.decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import {
+  CacheKey,
+  CacheTTL,
+  CacheInterceptor as CI,
+} from '@nestjs/cache-manager';
+import { Throttle } from 'src/common/decorator/throttle.decorator';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 @Controller('movie')
@@ -45,6 +51,10 @@ export class MovieController {
 
   @Get()
   @Public()
+  @Throttle({
+    count: 5,
+    unit: 'minute',
+  })
   // @UseInterceptors(CacheInterceptor)
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     // title 쿼리 타입이 string 타입인지?
@@ -54,6 +64,9 @@ export class MovieController {
 
   // movie/recent
   @Get('recent')
+  @UseInterceptors(CI) //인터셉터로 캐싱을하면 url을 기반으로 한다 query가 변경될 때 마다 다른 값으로 저장된다
+  @CacheKey('getMoviesRecent') // 이건 쿼리가 변경이 되어도 캐쉬키를 일괄적으로 박아줄 수 있다
+  @CacheTTL(1000)
   getMoviesRecent() {
     return this.movieService.findRecent();
   }
