@@ -20,7 +20,6 @@ export class RBACGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     const user = request.user;
-
     if (!user) {
       return false;
     }
