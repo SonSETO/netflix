@@ -1,17 +1,24 @@
 import { flatten, Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
 import { readdir, unlink } from 'fs/promises';
 import { join, parse } from 'path';
+import { Movie } from 'src/movie/entity/movie.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
-  constructor() {}
+  constructor(
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie>,
+    private readonly schedulerRegistry: SchedulerRegistry,
+  ) {}
 
   logEverySecond() {
     console.log('1초마다 실행!');
   }
 
-  @Cron('* * * * * *')
+  //   @Cron('* * * * * *')
   async eraseOrphanFiles() {
     const files = await readdir(join(process.cwd(), 'public', 'temp'));
 
@@ -49,5 +56,52 @@ export class TasksService {
 
     //     await unlink(join(process.cwd(),'public', 'temp', fileName))
     // }
+  }
+
+  //   @Cron('0 * * * * *')
+  // 좋아요 통계
+  async calculateMovieLikeCounts() {
+    console.log('run');
+    await this.movieRepository.query(
+      `UPDATE movie m
+SET "likeCount" = (
+	SELECT count(*) FROM movie_user_like mul
+	WHERE m.id = mul."movieId" and mul."isLike" = true
+)`,
+    );
+    await this.movieRepository.query(
+      `UPDATE movie m
+SET "dislikeCount" = (
+	SELECT count(*) FROM movie_user_like mul
+	WHERE m.id = mul."movieId" and mul."isLike" = false
+);`,
+    );
+  }
+
+  //   @Cron('* * * * * *', {
+  //     name: 'printer',
+  //   })
+  printer() {
+    console.log('print every seconds');
+  }
+
+  //   @Cron('*/5 * * * * *')
+  stopper() {
+    console.log('---stopper run---');
+
+    const job = this.schedulerRegistry.getCronJob('printer');
+
+    // console.log('# Last Date');
+    // console.log(job.lastDate());
+    // console.log('# Next Date');
+    // console.log(job.nextDate());
+    // console.log('# Next Dates');
+    // console.log(job.nextDates(5));
+
+    if (job.running) {
+      job.stop();
+    } else {
+      job.start();
+    }
   }
 }
