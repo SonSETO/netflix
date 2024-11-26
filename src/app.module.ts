@@ -39,6 +39,7 @@ import * as winston from 'winston';
     // 검증
     ConfigModule.forRoot({
       isGlobal: true,
+
       validationSchema: Joi.object({
         ENV: Joi.string().valid('dev', 'prod').required(),
         DB_TYPE: Joi.string().valid('postgres').required(),

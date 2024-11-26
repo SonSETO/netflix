@@ -22,15 +22,15 @@ export class TasksService {
     private readonly logger: LoggerService,
   ) {}
 
-  @Cron('*/5 * * * * *')
+  //   @Cron('*/5 * * * * *')
   logEverySecond() {
     // 중요도 레벨
-    this.logger.fatal('FATAL 레벨 로그', null, TasksService.name);
-    this.logger.error('ERROR 레벨 로그', null, TasksService.name);
-    this.logger.warn('WARN 레벨 로그', TasksService.name);
-    this.logger.log('LOG 레벨 로그', TasksService.name);
-    this.logger.debug('DEBUG 레벨 로그', TasksService.name);
-    this.logger.verbose('VERBOSE 레벨 로그', TasksService.name);
+    // this.logger.fatal('FATAL 레벨 로그', null, TasksService.name);
+    // this.logger.error('ERROR 레벨 로그', null, TasksService.name);
+    // this.logger.warn('WARN 레벨 로그', TasksService.name);
+    // this.logger.log('LOG 레벨 로그', TasksService.name);
+    // this.logger.debug('DEBUG 레벨 로그', TasksService.name);
+    // this.logger.verbose('VERBOSE 레벨 로그', TasksService.name);
   }
 
   //   @Cron('* * * * * *')

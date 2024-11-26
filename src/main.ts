@@ -1,11 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['verbose'],
+  });
+
+  // global하게
+  // app.setGlobalPrefix('v1');
+
+  // controller단 url로 가능
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  // });
+
+  // 헤더에 version넣어서 하는 방법
+  // app.enableVersioning({
+  //   type: VersioningType.HEADER,
+  //   header: 'version',
+  // });
+
+  // headers에 Accept : application/json;v=1
+  //이런 형식으로 가능함
+  app.enableVersioning({
+    type: VersioningType.MEDIA_TYPE,
+    key: 'v=',
   });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));

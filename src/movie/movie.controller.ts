@@ -16,6 +16,8 @@ import {
   UseGuards,
   UploadedFile,
   UploadedFiles,
+  Version,
+  VERSION_NEUTRAL,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
@@ -44,7 +46,22 @@ import {
 import { Throttle } from 'src/common/decorator/throttle.decorator';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
-@Controller('movie')
+@Controller({
+  path: 'movie',
+  version: '2',
+})
+export class MovieControllerV2 {
+  @Get()
+  getMovie() {
+    return [];
+  }
+}
+
+@Controller({
+  path: 'movie',
+  // version 디폴트 때려주기
+  version: VERSION_NEUTRAL,
+})
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -55,6 +72,7 @@ export class MovieController {
     count: 5,
     unit: 'minute',
   })
+
   // @UseInterceptors(CacheInterceptor)
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     // title 쿼리 타입이 string 타입인지?
