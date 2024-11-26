@@ -2,31 +2,27 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['verbose'],
   });
 
-  // global하게
-  // app.setGlobalPrefix('v1');
+  const config = new DocumentBuilder()
+    .setTitle('패스트캠프 코팩 넷플릭스')
+    .setDescription('코드팩토리 NestJs 강의!')
+    .setVersion('1.0')
+    .addBasicAuth()
+    .addBearerAuth()
+    .build();
 
-  // controller단 url로 가능
-  // app.enableVersioning({
-  //   type: VersioningType.URI,
-  // });
+  const document = SwaggerModule.createDocument(app, config);
 
-  // 헤더에 version넣어서 하는 방법
-  // app.enableVersioning({
-  //   type: VersioningType.HEADER,
-  //   header: 'version',
-  // });
-
-  // headers에 Accept : application/json;v=1
-  //이런 형식으로 가능함
-  app.enableVersioning({
-    type: VersioningType.MEDIA_TYPE,
-    key: 'v=',
+  SwaggerModule.setup('doc', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
   });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
@@ -44,3 +40,31 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
+/* 
+   *version*
+
+    global하게
+  app.setGlobalPrefix('v1');
+
+  controller단 url로 가능
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
+  헤더에 version넣어서 하는 방법
+  app.enableVersioning({
+    type: VersioningType.HEADER,
+    header: 'version',
+  });
+
+  headers에 Accept : application/json;v=1
+  이런 형식으로 가능함
+
+  이게 보편적이라고는 함
+  app.enableVersioning({
+    type: VersioningType.MEDIA_TYPE,
+    key: 'v=',
+  });
+  
+  */

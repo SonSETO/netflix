@@ -44,11 +44,15 @@ import {
   CacheInterceptor as CI,
 } from '@nestjs/cache-manager';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
+/*
+ version
 @Controller({
   path: 'movie',
   version: '2',
+
 })
 export class MovieControllerV2 {
   @Get()
@@ -57,11 +61,14 @@ export class MovieControllerV2 {
   }
 }
 
-@Controller({
-  path: 'movie',
-  // version 디폴트 때려주기
-  version: VERSION_NEUTRAL,
-})
+path: 'movie',
+// version 디폴트 때려주기
+version: VERSION_NEUTRAL,
+
+*/
+
+@Controller('movie')
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
