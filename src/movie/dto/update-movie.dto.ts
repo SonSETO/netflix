@@ -38,7 +38,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { createMovieDto } from './create-movie.dto';
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/swagger';
 
 // 커스텀 벨리데이터 해보기
 // @ValidatorConstraint({
@@ -165,7 +165,6 @@ import { PartialType } from '@nestjs/mapped-types';
 //     message: '다른 에러 메시지',
 //   })
 
-export class updateMovieDto extends PartialType(createMovieDto) {}
 // @IsNotEmpty()
 // @IsString()
 // @IsOptional()
@@ -188,3 +187,5 @@ export class updateMovieDto extends PartialType(createMovieDto) {}
 // @IsOptional()
 // @IsNumber()
 // directorId?: number;
+
+export class updateMovieDto extends PartialType(createMovieDto) {}
