@@ -55,29 +55,24 @@ import * as winston from 'winston';
     }),
     // Ioc 컨테이너가 해줌
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
-        console.log('ENV:', configService.get<string>('ENV'));
-        console.log('DB_TYPE:', configService.get<string>('DB_TYPE'));
-        console.log('DB_HOST:', configService.get<string>('DB_HOST'));
-        console.log('DB_PORT:', configService.get<number>('DB_PORT'));
-        console.log('DB_USERNAME:', configService.get<string>('DB_USERNAME'));
-        console.log('DB_PASSWORD:', configService.get<string>('DB_PASSWORD'));
-        console.log('DB_DATABASE:', configService.get<string>('DB_DATABASE'));
-
-        return {
-          type: configService.get<string>('DB_TYPE') as 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USERNAME'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_DATABASE'),
-          entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
-          synchronize: true,
+      useFactory: (configService: ConfigService) => ({
+        type: configService.get<string>(envVariableKeys.dbType) as 'postgres',
+        host: configService.get<string>(envVariableKeys.dbHOST),
+        port: configService.get<number>(envVariableKeys.dbPORT),
+        username: configService.get<string>(envVariableKeys.dbUSERNAME),
+        password: configService.get<string>(envVariableKeys.dbPASSWORD),
+        database: configService.get<string>(envVariableKeys.dbDATABASE),
+        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
+        synchronize:
+          configService.get<string>(envVariableKeys.env) === 'prod'
+            ? false
+            : true,
+        ...(configService.get<string>(envVariableKeys.env) === 'prod' && {
           ssl: {
             rejectUnauthorized: false,
           },
-        };
-      },
+        }),
+      }),
       inject: [ConfigService],
     }),
     // TypeOrmModule.forRoot({
