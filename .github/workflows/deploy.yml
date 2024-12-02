@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      
+
       - name: Install Depencies
         run: npm i
 
@@ -47,7 +47,7 @@ jobs:
             --version-label $GITHUB_SHA \
             --source-bundle S3Bucket="nestjs-netflix-bucket-seto-1",S3Key="deploy.zip"
 
-        aws elasticbeanstalk update-environment \
-          --application-name "Nestjs-netflix-seto-EB"
-          --environment-name "Nestjs-netflix-seto-EB-env"
-          --version-label $GITHUB_SHA \
+          aws elasticbeanstalk update-environment \
+            --application-name "Nestjs-netflix-seto-EB"
+            --environment-name "Nestjs-netflix-seto-EB-env"
+            --version-label $GITHUB_SHA \
