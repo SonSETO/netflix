@@ -44,10 +44,10 @@ jobs:
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name "Nestjs-netflix-seto-EB" \
-            --version-label $GITHUB_SHA \
+            --version-label ${{ github.sha }} \
             --source-bundle S3Bucket="nestjs-netflix-bucket-seto-1",S3Key="deploy.zip"
 
           aws elasticbeanstalk update-environment \
             --application-name "Nestjs-netflix-seto-EB"
             --environment-name "Nestjs-netflix-seto-EB-env"
-            --version-label $GITHUB_SHA \
+            --version-label ${{ github.sha }} \
