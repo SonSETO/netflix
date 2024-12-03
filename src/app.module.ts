@@ -71,12 +71,11 @@ import * as winston from 'winston';
           configService.get<string>(envVariableKeys.env) === 'prod'
             ? false
             : true,
-        ...(configService.get<string>(envVariableKeys.env) === 'prod' &&
-          {
-            // ssl: {
-            //   rejectUnauthorized: false,
-            // },
-          }),
+        ...(configService.get<string>(envVariableKeys.env) === 'prod' && {
+          ssl: {
+            rejectUnauthorized: false,
+          },
+        }),
       }),
       inject: [ConfigService],
     }),
