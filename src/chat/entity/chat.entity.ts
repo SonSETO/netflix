@@ -15,5 +15,5 @@ export class Chat extends BaseTable {
   message: string;
 
   @ManyToOne(() => ChatRoom, (chatRoom) => chatRoom.chats)
-  chatRoom: ChatRoom[];
+  chatRoom: ChatRoom;
 }
