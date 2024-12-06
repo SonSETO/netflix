@@ -37,8 +37,9 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { createMovieDto } from './create-movie.dto';
+
 import { PartialType } from '@nestjs/swagger';
+import { CreateMovieDto } from './create-movie.dto';
 
 // 커스텀 벨리데이터 해보기
 // @ValidatorConstraint({
@@ -188,4 +189,4 @@ import { PartialType } from '@nestjs/swagger';
 // @IsNumber()
 // directorId?: number;
 
-export class updateMovieDto extends PartialType(createMovieDto) {}
+export class UpdateMovieDto extends PartialType(CreateMovieDto) {}

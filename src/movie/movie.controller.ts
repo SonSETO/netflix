@@ -21,8 +21,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
-import { createMovieDto } from './dto/create-movie.dto';
-import { updateMovieDto } from './dto/update-movie.dto';
+
+import { UpdateMovieDto } from './dto/Update-movie.dto';
 import { MovieTitleValidationPipe } from './pipe/movie-title-validation.pipe';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
@@ -51,6 +51,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CreateMovieDto } from './dto/create-movie.dto';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 /*
@@ -201,21 +202,25 @@ export class MovieController {
 
   @Post()
   @RBAC(Role.admin)
-  @UseInterceptors(TransactionInterceptor)
+  // @UseInterceptors(TransactionInterceptor)
   postMovie(
-    @Body() body: createMovieDto,
+    @Body() body: CreateMovieDto,
     // @Request() req,
-    @QueryRunner() queryRunner: QR,
+    // @QueryRunner() queryRunner: QR,
     @UserId() userId: number,
   ) {
-    return this.movieService.create(body, userId, queryRunner);
+    return this.movieService.create(
+      body,
+      userId,
+      //queryRunner
+    );
   }
 
   @Patch(':id')
   @RBAC(Role.admin)
   patchMovie(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: updateMovieDto,
+    @Body() body: UpdateMovieDto,
   ) {
     return this.movieService.update(id, body);
   }

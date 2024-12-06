@@ -80,13 +80,17 @@ CREATE TABLE "Director" (
 -- CreateTable
 CREATE TABLE "_ChatRoomToUser" (
     "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_ChatRoomToUser_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_GenreToMovie" (
     "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_GenreToMovie_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -105,13 +109,7 @@ CREATE UNIQUE INDEX "Movie_directorId_key" ON "Movie"("directorId");
 CREATE UNIQUE INDEX "Genre_name_key" ON "Genre"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_ChatRoomToUser_AB_unique" ON "_ChatRoomToUser"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_ChatRoomToUser_B_index" ON "_ChatRoomToUser"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_GenreToMovie_AB_unique" ON "_GenreToMovie"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_GenreToMovie_B_index" ON "_GenreToMovie"("B");

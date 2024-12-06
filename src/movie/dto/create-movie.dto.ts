@@ -8,7 +8,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class createMovieDto {
+export class CreateMovieDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
