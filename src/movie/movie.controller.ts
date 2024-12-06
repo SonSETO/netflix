@@ -27,7 +27,7 @@ import { MovieTitleValidationPipe } from './pipe/movie-title-validation.pipe';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
-import { Role } from 'src/user/entity/user.entity';
+// import { Role } from 'src/user/entity/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import {
@@ -52,6 +52,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { Role } from '@prisma/client';
 // import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 
 /*
