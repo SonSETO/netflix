@@ -13,6 +13,7 @@ const awsSecretAccessKey = 'AWS_SECRET_ACCESS_KEY';
 const awsAccessKeyId = 'AWS_ACCESS_KEY_ID';
 const awsRegion = 'AWS_REGION';
 const bucketName = 'BUCKET_NAME';
+const MONGO_URI = 'MONGO_URI';
 
 export const envVariableKeys = {
   env,
@@ -30,4 +31,5 @@ export const envVariableKeys = {
   awsAccessKeyId,
   awsRegion,
   bucketName,
+  MONGO_URI,
 };

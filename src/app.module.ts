@@ -37,6 +37,7 @@ import * as winston from 'winston';
 import { Chat } from './chat/entity/chat.entity';
 import { ChatRoom } from './chat/entity/chat-room.entity';
 import { WorkerModule } from './worker/worker.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -60,7 +61,15 @@ import { WorkerModule } from './worker/worker.module';
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_REGION: Joi.string().required(),
         BUCKET_NAME: Joi.string().required(),
+        MONGO_URI: Joi.string().required(),
       }),
+    }),
+
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>(envVariableKeys.MONGO_URI),
+      }),
+      inject: [ConfigService],
     }),
     // Ioc 컨테이너가 해줌
     TypeOrmModule.forRootAsync({
