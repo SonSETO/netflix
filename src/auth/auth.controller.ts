@@ -43,7 +43,7 @@ export class AuthController {
   async rotateAccessToken(@Request() req) {
     return {
       accessToken: await this.authService.issueToken(
-        { id: req.user.sub, role: req.user.role },
+        { _id: req.user.sub, role: req.user.role },
         false,
       ),
     };

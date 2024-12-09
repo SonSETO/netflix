@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entity/user.entity';
+// import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PrismaService } from 'src/common/prisma.service';
@@ -13,6 +13,9 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { envVariableKeys } from 'src/common/const/env.const';
 import { Prisma } from '@prisma/client';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schema/user.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -20,18 +23,23 @@ export class UserService {
     // @InjectRepository(User)
     // private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService,
+    // private readonly prisma: PrismaService,
+    @InjectModel(User.name)
+    private readonly userModel: Model<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
 
+    //mongoose
+    const user = await this.userModel.findOne({ email }).exec();
+
     // prisma
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     email,
+    //   },
+    // });
 
     //typeorm
     // const user = await this.userRepository.findOne({
@@ -49,13 +57,30 @@ export class UserService {
       this.configService.get<number>(envVariableKeys.hashRounds),
     );
 
-    // prisma
-    await this.prisma.user.create({
-      data: {
-        email,
-        password: hash,
-      },
+    // mongoose
+    /*
+    방법 1
+    const newUser = new this.userModel({
+      email,
+      password:hash
+    })
+    await newUser.save()
+    
+    */
+
+    // 방법 2
+    await this.userModel.create({
+      email,
+      password: hash,
     });
+
+    // prisma
+    // await this.prisma.user.create({
+    //   data: {
+    //     email,
+    //     password: hash,
+    //   },
+    // });
 
     //typeorm
     // await this.userRepository.save({
@@ -63,12 +88,23 @@ export class UserService {
     //   password:hash
     // })
 
+    return this.userModel
+      .findOne(
+        { email },
+        {
+          createdMovies: 0,
+          likedMovies: 0,
+          chats: 0,
+          chatRooms: 0,
+        },
+      )
+      .exec();
     // prisma
-    return this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    // return this.prisma.user.findUnique({
+    //   where: {
+    //     email,
+    //   },
+    // });
 
     //typeorm
     // return this.userRepository.findOne({
@@ -79,18 +115,22 @@ export class UserService {
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.userModel.find().exec();
+
+    // return this.prisma.user.findMany();
 
     // typeorm
     // return this.userRepository.find();
   }
 
   async findOne(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userModel.findById(id);
+
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     // typeorm
     // const user = await this.userRepository.findOne({
@@ -107,11 +147,12 @@ export class UserService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password } = updateUserDto;
 
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userModel.findById(id);
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     // typeorm
     // const user = await this.userRepository.findOne({
@@ -139,12 +180,13 @@ export class UserService {
       };
     }
 
-    await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: input,
-    });
+    await this.userModel.findByIdAndUpdate(id, input).exec();
+    // await this.prisma.user.update({
+    //   where: {
+    //     id,
+    //   },
+    //   data: input,
+    // });
 
     // typeorm
     // await this.userRepository.update(
@@ -154,11 +196,13 @@ export class UserService {
     //   },
     // );
 
-    return this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    return this.userModel.findById(id);
+
+    // return this.prisma.user.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     // typeorm
     // return this.userRepository.findOne({
@@ -169,11 +213,13 @@ export class UserService {
   }
 
   async remove(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userModel.findById(id);
+
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     // typeorm
     // const user = await this.userRepository.findOne({
@@ -186,11 +232,13 @@ export class UserService {
       throw new NotFoundException('존재하지 않는 사용자입니다!');
     }
 
-    await this.prisma.user.delete({
-      where: {
-        id,
-      },
-    });
+    await this.userModel.findByIdAndDelete(id);
+
+    // await this.prisma.user.delete({
+    //   where: {
+    //     id,
+    //   },
+    // });
 
     // typeorm
     // await this.userRepository.delete(id);

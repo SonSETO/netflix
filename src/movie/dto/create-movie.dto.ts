@@ -21,37 +21,33 @@ export class CreateMovieDto {
   @IsString()
   @ApiProperty({
     description: '영화 설명',
-    example: '시간 빨리 갑니다',
+    example: '3시간 훅가쥬?',
   })
   detail: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   @ApiProperty({
-    description: '감독 객체ID',
+    description: '감독 객체 ID',
     example: 1,
   })
-  directorId: number;
+  directorId: string;
 
-  @IsArray()
   @ArrayNotEmpty()
-  @IsNumber(
-    {},
-    {
-      each: true,
-    },
-  )
-  @Type(() => Number)
+  @IsString({
+    each: true,
+  })
+  @Type(() => String)
   @ApiProperty({
     description: '장르 IDs',
     example: [1, 2, 3],
   })
-  genreIds: number[];
+  genreIds: string[];
 
   @IsString()
   @ApiProperty({
     description: '영화 파일 이름',
-    example: 'aaaa-bbbb-cccc-dddd',
+    example: 'aaa-bbb-ccc-ddd.jpg',
   })
   movieFileName: string;
 }
